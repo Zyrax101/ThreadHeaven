@@ -718,14 +718,18 @@ class CartManager {
 
             const orderId = 'ORD-' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 1000);
 
-            await db.createOrder({
+            const payload = {
                 order_id: orderId,
                 customer_email: customer.email,
-                amount: this.getTotal(),
+                amount: parseFloat(this.getTotal()), // Ensure number
                 status: 'pending',
-                items: this.items,
+                items: this.items, // Supabase handles this, but if it fails, try JSON.stringify(this.items)
                 shipping_address: `${customer.address}, ${customer.city}, ${customer.zip}, ${customer.country}`
-            });
+            };
+
+            console.log('[Checkout] Sending Payload:', payload);
+
+            await db.createOrder(payload);
 
             const result = { success: true, orderId: orderId, emailSent: false };
 
@@ -778,7 +782,13 @@ class CartManager {
             btn.disabled = false;
             btnText.style.display = 'inline-flex';
             btnLoading.style.display = 'none';
-            alert('There was an error processing your order. Please try again.');
+            // Show specific error message to help debugging
+            const errorMsg = error.message || 'Unknown error';
+            const errorDetails = error.details || error.hint || '';
+            const fullError = JSON.stringify(error, null, 2);
+            console.error('Full Checkout Error:', fullError);
+
+            alert(`Error processing order:\n${errorMsg}\n\nDetails: ${errorDetails}\n\nTechnical: ${fullError}`);
         }
     }
 }
