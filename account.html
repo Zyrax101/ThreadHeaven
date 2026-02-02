@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account | Thread Heaven</title>
+    <meta name="description" content="Manage your Thread Heaven account, view orders, and track your purchases.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --bg-main: #050505;
+            --card-bg: #121212;
+            --text-main: #e5e5e5;
+            --text-muted: #888888;
+            --accent-gold: #c5a028;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --font-header: 'Playfair Display', serif;
+            --font-mono: 'Courier Prime', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 24px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .logo {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-gold);
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 120px 24px 60px;
+        }
+
+        .page-title {
+            font-family: var(--font-header);
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 16px 24px;
+            }
+
+            .nav-links {
+                gap: 16px;
+            }
+        }
+
+        .auth-section {
+            background: var(--card-bg);
+            padding: 32px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .auth-section h2 {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .auth-section p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-subtle);
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent-gold);
+            color: black;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: white;
+        }
+
+        .btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-gold);
+            color: black;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .success-msg {
+            color: #2ecc71;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            display: none;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .auth-forms.hidden {
+            display: none;
+        }
+
+        /* User Info Bar */
+        .user-info {
+            background: var(--card-bg);
+            padding: 20px 28px;
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .user-email {
+            font-size: 1rem;
+        }
+
+        .user-email span {
+            color: var(--accent-gold);
+        }
+
+        .btn-logout {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid #333;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            border-color: #e74c3c;
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-card i {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* Orders Section */
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .orders-header h2 {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-tab:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .filter-tab.active {
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+            color: black;
+        }
+
+        /* No Orders */
+        .no-orders {
+            background: var(--card-bg);
+            padding: 48px;
+            text-align: center;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .no-orders i {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .no-orders p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .no-orders .btn {
+            width: auto;
+            display: inline-block;
+            padding: 14px 32px;
+        }
+
+        /* Order Card */
+        .order-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .order-header:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .order-id {
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+        }
+
+        .order-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .order-status {
+            padding: 4px 12px;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 2px;
+        }
+
+        .order-status.paid {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+        }
+
+        .order-status.processing {
+            background: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+
+        .order-status.shipped {
+            background: rgba(155, 89, 182, 0.15);
+            color: #9b59b6;
+        }
+
+        .order-status.delivered {
+            background: rgba(46, 204, 113, 0.25);
+            color: #27ae60;
+        }
+
+        .order-status.pending {
+            background: rgba(241, 196, 15, 0.15);
+            color: #f1c40f;
+        }
+
+        .order-total {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .order-details {
+            padding: 0 24px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .order-details.expanded {
+            max-height: 500px;
+            padding: 20px 24px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-name {
+            color: var(--text-main);
+        }
+
+        .order-item-details {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-muted);
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: 60px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="/" class="logo">THREAD HEAVEN</a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/">Shop</a></li>
+                <li><a href="/shipping.html">Shipping</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+                <li><a href="/account.html" style="color: var(--accent-gold);">Account</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h1 class="page-title">My Account</h1>
+        <p class="page-subtitle" id="page-subtitle">Sign in to view your orders and manage your account.</p>
+
+        <!-- Auth Forms -->
+        <div class="auth-forms" id="auth-forms">
+            <div class="auth-container">
+                <!-- Login -->
+                <div class="auth-section">
+                    <h2>Sign In</h2>
+                    <p>Welcome back! Enter your details below.</p>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="login-email" required placeholder="you@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="login-password" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn" id="login-btn">Sign In</button>
+                        <p class="error-msg" id="login-error"></p>
+                    </form>
+                </div>
+
+                <!-- Sign Up -->
+                <div class="auth-section">
+                    <h2>Create Account</h2>
+                    <p>New here? Create an account to track orders.</p>
+                    <form id="signup-form">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="signup-name" placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="signup-email" required placeholder="you@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="signup-password" required placeholder="Min. 6 characters"
+                                minlength="6">
+                        </div>
+                        <button type="submit" class="btn btn-secondary" id="signup-btn">Create Account</button>
+                        <p class="error-msg" id="signup-error"></p>
+                        <p class="success-msg" id="signup-success"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <!-- User Info -->
+            <div class="user-info">
+                <div class="user-email">
+                    Signed in as <span id="user-email"></span>
+                </div>
+                <button class="btn-logout" id="logout-btn">Sign Out</button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-shopping-bag"></i>
+                    <div class="stat-value" id="stat-orders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-dollar-sign"></i>
+                    <div class="stat-value" id="stat-spent">$0</div>
+                    <div class="stat-label">Total Spent</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-value" id="stat-pending">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+            </div>
+
+            <!-- Address Settings -->
+            <div class="auth-section" style="margin-bottom: 32px; margin-top: 32px;">
+                <h2 style="margin-bottom: 16px;">Shipping Address</h2>
+                <p style="margin-bottom: 24px;">Manage your default shipping address for faster checkout.</p>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profile-name" placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Address <small style="color: var(--accent-gold);">(Start typing to
+                                search)</small></label>
+                        <input type="text" id="profile-address" placeholder="123 Fashion St" autocomplete="off">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="profile-city" placeholder="New York">
+                        </div>
+                        <div class="form-group">
+                            <label>ZIP Code</label>
+                            <input type="text" id="profile-zip" placeholder="10001">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Country</label>
+                        <select id="profile-country"
+                            style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); color: white; font-family: var(--font-mono); border-radius: 4px;">
+                            <option value="" disabled selected>Select Country</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-secondary" id="save-profile-btn">Save Changes</button>
+                    <p class="success-msg" id="profile-success"></p>
+                    <p class="error-msg" id="profile-error"></p>
+                </form>
+            </div>
+
+            <!-- Orders Section -->
+            <div class="orders-section">
+                <div class="orders-header">
+                    <h2>Your Orders</h2>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">All</button>
+                        <button class="filter-tab" data-filter="pending">Pending</button>
+                        <button class="filter-tab" data-filter="processing">Processing</button>
+                        <button class="filter-tab" data-filter="shipped">Shipped</button>
+                        <button class="filter-tab" data-filter="delivered">Delivered</button>
+                    </div>
+                </div>
+                <div id="orders-loading" class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading orders...</p>
+                </div>
+                <div id="orders-container"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Thread Heaven. All rights reserved.</p>
+    </footer>
+
+    <!-- Supabase & Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/countries.js"></script>
+    <script src="js/address-validator.js"></script>
+    <script>
+        // State
+        let allOrders = [];
+        let currentFilter = 'all';
+
+        // DOM Elements
+        const authForms = document.getElementById('auth-forms');
+        const dashboard = document.getElementById('dashboard');
+        const pageSubtitle = document.getElementById('page-subtitle');
+        const userEmailEl = document.getElementById('user-email');
+        const ordersContainer = document.getElementById('orders-container');
+        const ordersLoading = document.getElementById('orders-loading');
+
+        // Stats
+        const statOrders = document.getElementById('stat-orders');
+        const statSpent = document.getElementById('stat-spent');
+        const statPending = document.getElementById('stat-pending');
+
+        // Login form
+        const loginForm = document.getElementById('login-form');
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        const loginBtn = document.getElementById('login-btn');
+        const loginError = document.getElementById('login-error');
+
+        // Signup form
+        const signupForm = document.getElementById('signup-form');
+        const signupName = document.getElementById('signup-name');
+        const signupEmail = document.getElementById('signup-email');
+        const signupPassword = document.getElementById('signup-password');
+        const signupBtn = document.getElementById('signup-btn');
+        const signupError = document.getElementById('signup-error');
+        const signupSuccess = document.getElementById('signup-success');
+
+        // Logout
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Filter tabs
+        const filterTabs = document.querySelectorAll('.filter-tab');
+
+        // Profile elements
+        const profileForm = document.getElementById('profile-form');
+        const profileName = document.getElementById('profile-name');
+        const profileAddress = document.getElementById('profile-address');
+        const profileCity = document.getElementById('profile-city');
+        const profileZip = document.getElementById('profile-zip');
+        const profileCountry = document.getElementById('profile-country');
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+        const profileSuccess = document.getElementById('profile-success');
+        const profileError = document.getElementById('profile-error');
+
+        // Helpers
+        function showError(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+        function hideError(el) { el.style.display = 'none'; }
+        function showSuccess(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+
+        // Update UI based on auth
+        async function updateAuthUI() {
+            const user = await db.getUser();
+
+            if (user) {
+                authForms.classList.add('hidden');
+                dashboard.classList.add('active');
+                pageSubtitle.textContent = 'View your orders and manage your account.';
+                userEmailEl.textContent = user.email;
+                loadOrders();
+                loadProfile();
+            } else {
+                authForms.classList.remove('hidden');
+                dashboard.classList.remove('active');
+                pageSubtitle.textContent = 'Sign in to view your orders and manage your account.';
+            }
+        }
+
+        // Load profile
+        async function loadProfile() {
+            try {
+                // Init countries
+                populateCountrySelect(profileCountry);
+
+                // Init address validation
+                addressValidator.attach(profileAddress, (selected) => {
+                    profileAddress.value = selected.street || selected.display_name;
+                    profileCity.value = selected.city;
+                    profileZip.value = selected.zip;
+                    // Auto-select country if matches
+                    const countryOpt = Array.from(profileCountry.options).find(opt => opt.value === selected.country);
+                    if (countryOpt) {
+                        profileCountry.value = countryOpt.value;
+                        profileCountry.dispatchEvent(new Event('change'));
+                    }
+                });
+
+                const profile = await db.getUserProfile();
+                if (profile) {
+                    profileName.value = profile.name || '';
+                    profileAddress.value = profile.address || '';
+                    profileCity.value = profile.city || '';
+                    profileZip.value = profile.zip || '';
+                    if (profile.country) {
+                        profileCountry.value = profile.country;
+                        profileCountry.dispatchEvent(new Event('change'));
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading profile:', e);
+            }
+        }
+
+        // Save profile
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError(profileError);
+            hideError(profileSuccess);
+            saveProfileBtn.disabled = true;
+            saveProfileBtn.textContent = 'Saving...';
+
+            try {
+                await db.updateUserProfile({
+                    name: profileName.value,
+                    address: profileAddress.value,
+                    city: profileCity.value,
+                    zip: profileZip.value,
+                    country: profileCountry.value
+                });
+                showSuccess(profileSuccess, 'Address saved successfully!');
+            } catch (error) {
+                showError(profileError, 'Could not save address. Please try again.');
+            } finally {
+                saveProfileBtn.disabled = false;
+                saveProfileBtn.textContent = 'Save Changes';
+            }
+        });
+
+        // Load orders
+        async function loadOrders() {
+            ordersLoading.style.display = 'block';
+            ordersContainer.innerHTML = '';
+
+            try {
+                allOrders = await db.getUserOrders();
+                ordersLoading.style.display = 'none';
+
+                // Update stats
+                updateStats();
+
+                // Render orders
+                renderOrders();
+            } catch (error) {
+                ordersLoading.style.display = 'none';
+                ordersContainer.innerHTML = `
+                    <div class="no-orders">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Could not load orders. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            const totalOrders = allOrders.length;
+            const totalSpent = allOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+            const pendingOrders = allOrders.filter(o =>
+                ['pending', 'processing', 'paid'].includes((o.status || '').toLowerCase())
+            ).length;
+
+            statOrders.textContent = totalOrders;
+            statSpent.textContent = `$${totalSpent.toFixed(0)}`;
+            statPending.textContent = pendingOrders;
+        }
+
+        // Render orders with filter
+        function renderOrders() {
+            let filtered = allOrders;
+
+            if (currentFilter !== 'all') {
+                filtered = allOrders.filter(o =>
+                    (o.status || 'pending').toLowerCase() === currentFilter
+                );
+            }
+
+            if (filtered.length === 0) {
+                ordersContainer.innerHTML = `
+                    <div class="no-orders">
+                        <i class="fas fa-shopping-bag"></i>
+                        <p>${currentFilter === 'all' ? "You haven't placed any orders yet." : `No ${currentFilter} orders.`}</p>
+                        <a href="/" class="btn">Start Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+
+            ordersContainer.innerHTML = '';
+            filtered.forEach(order => {
+                const orderEl = createOrderCard(order);
+                ordersContainer.appendChild(orderEl);
+            });
+        }
+
+        // Create order card
+        function createOrderCard(order) {
+            const div = document.createElement('div');
+            div.className = 'order-card';
+
+            const date = new Date(order.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            const items = order.items || [];
+            const status = (order.status || 'pending').toLowerCase();
+
+            const itemsHtml = items.map(item => `
+                <div class="order-item">
+                    <div>
+                        <div class="order-item-name">${item.name || 'Item'}</div>
+                        <div class="order-item-details">Size: ${item.size || 'N/A'} • Qty: ${item.quantity || 1}</div>
+                    </div>
+                    <div class="order-item-price">$${(item.price || 0).toFixed(2)}</div>
+                </div>
+            `).join('');
+
+            div.innerHTML = `
+                <div class="order-header" onclick="toggleOrderDetails(this)">
+                    <div>
+                        <div class="order-id">${order.id || order.order_id}</div>
+                        <div class="order-date">${date}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <span class="order-status ${status}">${status}</span>
+                        <span class="order-total">$${(order.total || 0).toFixed(2)}</span>
+                        <i class="fas fa-chevron-down" style="color: var(--text-muted); transition: transform 0.3s;"></i>
+                    </div>
+                </div>
+                <div class="order-details">
+                    ${itemsHtml}
+                </div>
+            `;
+
+            return div;
+        }
+
+        // Toggle order details
+        function toggleOrderDetails(header) {
+            const details = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            details.classList.toggle('expanded');
+            icon.style.transform = details.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0)';
+        }
+
+        // Filter tabs
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                filterTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentFilter = tab.dataset.filter;
+                renderOrders();
+            });
+        });
+
+        // Login handler
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError(loginError);
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+
+            try {
+                await db.signIn(loginEmail.value, loginPassword.value);
+                await updateAuthUI();
+            } catch (error) {
+                showError(loginError, error.message || 'Invalid email or password');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+
+        // Signup handler
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError(signupError);
+            hideError(signupSuccess);
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Creating account...';
+
+            try {
+                // Client-side signup via Supabase
+                await db.signUp(signupEmail.value, signupPassword.value, signupName.value);
+
+                showSuccess(signupSuccess, 'Verification email sent! Check your inbox.');
+                signupForm.reset();
+            } catch (error) {
+                showError(signupError, error.message || 'Could not create account');
+            } finally {
+                signupBtn.disabled = false;
+                signupBtn.textContent = 'Create Account';
+            }
+        });
+
+        // Logout handler
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await db.signOut();
+                await updateAuthUI();
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await db.init();
+            await updateAuthUI();
+
+            db.onAuthStateChange((event, session) => {
+                updateAuthUI();
+            });
+        });
+    </script>
+</body>
+
+</html>

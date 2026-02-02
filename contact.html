@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Thread Heaven</title>
+    <meta name="description"
+        content="Get in touch with Thread Heaven. We're here to help with orders, questions, and collaborations.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-main: #050505;
+            --card-bg: #121212;
+            --text-main: #e5e5e5;
+            --text-muted: #888888;
+            --accent-gold: #c5a028;
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --font-header: 'Playfair Display', serif;
+            --font-mono: 'Courier Prime', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            max-width: 1152px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navbar */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(5, 5, 5, 0.9);
+            backdrop-filter: blur(4px);
+            border-bottom: 1px solid var(--border-subtle);
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 2rem;
+        }
+
+        .logo-group:hover .logo-line {
+            width: 100%;
+        }
+
+        .logo-line {
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--accent-gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-gold);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            align-items: center;
+        }
+
+        .nav-links-left,
+        .nav-links-right {
+            flex: 1;
+        }
+
+        .nav-links-left {
+            justify-content: flex-start;
+        }
+
+        .nav-links-right {
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 767px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        .cart-btn {
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+        }
+
+        .cart-btn:hover {
+            color: white;
+            transition: color 0.3s ease;
+        }
+
+        .font-header {
+            font-family: var(--font-header);
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+
+        .tracking-widest {
+            letter-spacing: 0.1em;
+        }
+
+        .text-white {
+            color: white;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .font-mono {
+            font-family: var(--font-mono);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 80px 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .page-title {
+            font-family: var(--font-header);
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* Contact Grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 48px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Contact Info */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 16px;
+        }
+
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(197, 160, 40, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-gold);
+            flex-shrink: 0;
+        }
+
+        .info-content h3 {
+            font-family: var(--font-header);
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .info-content p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .info-content a {
+            color: var(--accent-gold);
+            transition: opacity 0.3s;
+        }
+
+        .info-content a:hover {
+            opacity: 0.8;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            padding: 32px;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+
+        .form-input::placeholder {
+            color: #555;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent-gold);
+            border: none;
+            color: black;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: white;
+        }
+
+        /* Social Links */
+        .social-links {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        .social-link:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* Footer */
+        footer {
+            padding: 32px 0;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="nav-inner">
+                <!-- Left Links -->
+                <div class="nav-links nav-links-left">
+                    <a href="index.html#collection" class="nav-link">ARCHIVE</a>
+                    <a href="shipping.html" class="nav-link">SHIPPING</a>
+                </div>
+
+                <!-- Logo (Center) -->
+                <a href="index.html" class="font-header text-2xl tracking-widest text-white relative logo-group"
+                    style="position: relative;">
+                    THREAD HEAVEN
+                    <span class="logo-line"></span>
+                </a>
+
+                <!-- Right Links + Cart -->
+                <div class="nav-links nav-links-right">
+                    <a href="contact.html" class="nav-link">CONTACT</a>
+                    <button class="cart-btn">
+                        <span class="font-mono text-xs">CART (0)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Get in <span style="color: var(--accent-gold); font-style: italic;">Touch</span>
+                </h1>
+                <p class="page-subtitle">
+                    Have a question about an order, collaboration inquiry, or just want to say hello?
+                    We'd love to hear from you.
+                </p>
+            </div>
+
+            <div class="contact-grid">
+                <!-- Contact Info -->
+                <div class="contact-info">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>Email</h3>
+                            <p><a href="mailto:hello@threadheaven.com">hello@threadheaven.com</a></p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>Response Time</h3>
+                            <p>We typically respond within 24-48 hours during business days.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>Location</h3>
+                            <p>Based in Los Angeles, CA<br>Shipping worldwide</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>Follow Us</h3>
+                            <div class="social-links">
+                                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-pinterest"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="contact-form">
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-input" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <select class="form-input">
+                                <option value="">Select a topic</option>
+                                <option value="order">Order Inquiry</option>
+                                <option value="returns">Returns & Exchanges</option>
+                                <option value="sizing">Sizing Help</option>
+                                <option value="collab">Collaboration</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-input" placeholder="How can we help?" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit">SEND MESSAGE</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="footer-text">© <span id="year"></span> THREAD HEAVEN. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+    <script>
+        document.getElementById('contact-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            alert('Thank you for your message! We will get back to you soon.');
+            this.reset();
+        });
+    </script>
+
+    <!-- Supabase & Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/cart.js"></script>
+</body>
+
+</html>
