@@ -721,9 +721,10 @@ class CartManager {
             const payload = {
                 order_id: orderId,
                 customer_email: customer.email,
-                amount: parseFloat(this.getTotal()), // Ensure number
+                total_amount: parseFloat(this.getTotal()), // Database expects 'total_amount'
+                amount: parseFloat(this.getTotal()), // Keep 'amount' just in case
                 status: 'pending',
-                items: this.items, // Supabase handles this, but if it fails, try JSON.stringify(this.items)
+                items: this.items,
                 shipping_address: `${customer.address}, ${customer.city}, ${customer.zip}, ${customer.country}`
             };
 
